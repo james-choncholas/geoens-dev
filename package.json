@@ -7,7 +7,8 @@
     "test": "test"
   },
   "dependencies": {
-    "@ensdomains/ens": "^0.3.11"
+    "@ensdomains/ens": "^0.3.11",
+    "@truffle/hdwallet-provider": "^1.0.26"
   },
   "devDependencies": {},
   "scripts": {
