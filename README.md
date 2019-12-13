@@ -1,8 +1,6 @@
 # GeoENS
-An extention of ENS (Ethereum Name Service) to support geographically specific ENS resolution.
-
-<br>
-More detailed description [here](eip-2390.md).
+An extension of ENS (Ethereum Name Service) to support geographically specific query resolution.
+More background and details are available [here](eip-2390.md).
 
 ## EIP 2390
 [EIP 2390](eip-2390.md) (Ethereum Improvement Proposal) was
