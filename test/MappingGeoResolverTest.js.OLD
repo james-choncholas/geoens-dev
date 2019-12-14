@@ -1,0 +1,121 @@
+const MappingGeoENSResolver = artifacts.require("MappingGeoENSResolver");
+const Selector = artifacts.require("Selector");
+const fs = require('fs');
+const util = require('util');
+
+// TODO print gas usagee
+
+contract('MappingGeoENSResolver', async accounts => {
+
+    var owner_account = accounts[0];
+    var act1 = accounts[1];
+    var act2 = accounts[2];
+
+    let geoResolver;
+    before(async () => {
+        geoResolver = await MappingGeoENSResolver.deployed();
+    });
+
+    it("should not accept sent funds", async () => {
+        var reverted = false;
+        try {
+            await geoResolver.sendTransaction({ from: owner_account, value: 1});
+        } catch (e) {
+            reverted = true;
+        }
+        assert.equal(reverted, true, "Owner sent funds to contract");
+    });
+
+    it("should set a geohash", async () => {
+        await geoResolver.setGeoAddr('0x0000000000000000000000000000000000000000000000000000000000000000',
+            '0x000000000000abcd',
+            act1,
+            {from: owner_account});
+    });
+
+    // truncate results file
+    fs.writeFileSync("./test/MappingGeoResolver-results/direct-resolve.txt");
+    for (i = 0; i < 100; i++) {
+        it("should resolve a geohash", async () => {
+            var t = process.hrtime();
+            a = await geoResolver.geoAddr('0x0000000000000000000000000000000000000000000000000000000000000000',
+                '0x000000000000abcd',
+                '0xFFFFFFFFFFFFFFFF');
+            t = process.hrtime(t);
+
+            // write time to file. (Zero pad ns with padStart)
+            fs.appendFileSync("./test/MappingGeoResolver-results/direct-resolve.txt", t[0] + "." + String(t[1]).padStart(9, '0') + "\n");
+
+            assert.equal(a[0], act1, "Did not correctly resolve address on direct query");
+        });
+    }
+
+    // truncate results file
+    fs.writeFileSync("./test/MappingGeoResolver-results/20km-resolve.txt");
+    for (i = 0; i < 100; i++) {
+        it("should resolve a 20km radius geohash search", async () => {
+            // if using 40 bits of precision total
+            // dropping to 10 bits gives a precision of 20km
+            var t = process.hrtime();
+            a = await geoResolver.geoAddr('0x0000000000000000000000000000000000000000000000000000000000000000',
+                '0x000000000000abcd',
+                '0xFFFFFFFF00000000');
+            t = process.hrtime(t);
+
+            // write time to file. (Zero pad ns with padStart)
+            fs.appendFileSync("./test/MappingGeoResolver-results/20km-resolve.txt", t[0] + "." + String(t[1]).padStart(9, '0') + "\n");
+
+            assert.equal(a[0], act1, "Did not correctly resolve address on 20km search query");
+        });
+    }
+
+    // truncate results file
+    fs.writeFileSync("./test/MappingGeoResolver-results/250mile-resolve.txt");
+    for (i = 0; i < 100; i++) {
+        it("should resolve a 250 mile radius geohash search", async () => {
+            var t = process.hrtime();
+            a = await geoResolver.geoAddr('0x0000000000000000000000000000000000000000000000000000000000000000',
+                '0x000000000000abcd',
+                '0xFFFFFFFFFFFFFF00');
+            t = process.hrtime(t);
+
+            // write time to file. (Zero pad ns with padStart)
+            fs.appendFileSync("./test/MappingGeoResolver-results/250mile-resolve.txt", t[0] + "." + String(t[1]).padStart(9, '0') + "\n");
+
+            assert.equal(a[0], act1, "Did not correctly resolve address on 250 mile search query");
+        });
+    }
+
+    it("should set and resolve multiple geohashes", async () => {
+        await geoResolver.setGeoAddr('0x0000000000000000000000000000000000000000000000000000000000000000',
+            '0x000000000000abcd',
+            act1,
+            {from: owner_account});
+        await geoResolver.setGeoAddr('0x0000000000000000000000000000000000000000000000000000000000000000',
+            '0x000000000000abce',
+            act2,
+            {from: owner_account});
+
+        a = await geoResolver.geoAddr('0x0000000000000000000000000000000000000000000000000000000000000000',
+            '0x000000000000abcd',
+            '0xFFFFFFFFFFFFFFFF');
+        assert.equal(a[0], act1, "Did not correctly resolve address on direct query");
+        assert.equal(a[1], 0, "Did not correctly resolve address on direct query");
+
+        a = await geoResolver.geoAddr('0x0000000000000000000000000000000000000000000000000000000000000000',
+            '0x000000000000abcd',
+            '0xFFFFFFFFFFFFFF00');
+        assert.equal(a[0], act1, "Did not correctly resolve address on indirect query");
+        assert.equal(a[1], act2, "Did not correctly resolve address on indirect query");
+    });
+
+    it("should return supported interfaces", async () => {
+        shouldbeyes = await geoResolver.supportsInterface("0x01ffc9a7", {from: owner_account});
+        assert.equal(shouldbeyes, true, "ERC165 supported interface should return true");
+
+        let selector = await Selector.new({from: owner_account});
+        erc165Hash = await selector.calculateSelector();
+        shouldbeyes = await geoResolver.supportsInterface(erc165Hash, {from: owner_account});
+        assert.equal(shouldbeyes, true, "ERC165 calculated hash for GeoENS should return true");
+    });
+});

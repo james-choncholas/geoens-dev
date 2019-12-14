@@ -1,6 +1,6 @@
 pragma solidity >=0.4.21 <0.6.0;
 
-contract OwnedGeoENSResolver {
+contract MappingGeoENSResolver {
     // Other code
 
     bytes4 constant ERC165ID = 0x01ffc9a7;
