@@ -3,12 +3,12 @@ Follow guide https://medium.com/@guccimanepunk/how-to-deploy-a-truffle-contract-
 # If using local client - start geth
 Create an account.
 ```
-geth --testnet account new
+geth --testnet account new --datadir /mnt/md0/eth/
 ```
 
 Start geth.
 ```
-geth --testnet --syncmode fast --rpc --rpcapi eth,net,web3,personal --rpccorsdomain="*" --allow-insecure-unlock
+geth --testnet --syncmode fast --rpc --rpcapi eth,net,web3,personal --rpccorsdomain="*" --allow-insecure-unlock --datadir /mnt/md0/eth/
 ```
 
 In a new terminal, attach to geth and unlock the account.
