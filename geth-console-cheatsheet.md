@@ -12,5 +12,6 @@ personal
 personal.unlockAccount(eth.accounts[0])
 
 eth.getBalance(eth.accounts[0])
+
 var w = web3.toWei(1, "ether")
 eth.getBalance(eth.accounts[0])/w
