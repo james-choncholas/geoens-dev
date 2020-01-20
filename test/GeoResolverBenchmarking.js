@@ -30,7 +30,7 @@ contract('GeoENSResolver', async accounts => {
 
 
     // truncate results file
-    fs.writeFileSync("./test/GeoResolver-results/direct-resolve.txt");
+    fs.writeFileSync("./test/GeoResolver-results/direct_resolve.txt", "Query Time\n");
     for (i = 0; i < 100; i++) {
         it("should resolve a geohash", async () => {
             var t = process.hrtime();
@@ -38,14 +38,14 @@ contract('GeoENSResolver', async accounts => {
             t = process.hrtime(t);
 
             // write time to file. (Zero pad ns with padStart)
-            fs.appendFileSync("./test/GeoResolver-results/direct-resolve.txt", t[0] + "." + String(t[1]).padStart(9, '0') + "\n");
+            fs.appendFileSync("./test/GeoResolver-results/direct_resolve.txt", t[0] + "." + String(t[1]).padStart(9, '0') + "\n");
 
             assert.equal(a[0], act1, "Did not correctly resolve address on direct query");
         });
     }
 
     // truncate results file
-    fs.writeFileSync("./test/GeoResolver-results/20km-resolve.txt");
+    fs.writeFileSync("./test/GeoResolver-results/20km_resolve.txt", "Query Time\n");
     for (i = 0; i < 100; i++) {
         it("should resolve a 20km radius geohash search", async () => {
             // if using 40 bits of precision total
@@ -55,14 +55,14 @@ contract('GeoENSResolver', async accounts => {
             t = process.hrtime(t);
 
             // write time to file. (Zero pad ns with padStart)
-            fs.appendFileSync("./test/GeoResolver-results/20km-resolve.txt", t[0] + "." + String(t[1]).padStart(9, '0') + "\n");
+            fs.appendFileSync("./test/GeoResolver-results/20km_resolve.txt", t[0] + "." + String(t[1]).padStart(9, '0') + "\n");
 
             assert.equal(a[0], act1, "Did not correctly resolve address on 20km search query");
         });
     }
 
     // truncate results file
-    fs.writeFileSync("./test/GeoResolver-results/630km-resolve.txt");
+    fs.writeFileSync("./test/GeoResolver-results/630km_resolve.txt", "Query Time\n");
     for (i = 0; i < 100; i++) {
         it("should resolve a 630km radius geohash search", async () => {
             var t = process.hrtime();
@@ -70,7 +70,7 @@ contract('GeoENSResolver', async accounts => {
             t = process.hrtime(t);
 
             // write time to file. (Zero pad ns with padStart)
-            fs.appendFileSync("./test/GeoResolver-results/630km-resolve.txt", t[0] + "." + String(t[1]).padStart(9, '0') + "\n");
+            fs.appendFileSync("./test/GeoResolver-results/630km_resolve.txt", t[0] + "." + String(t[1]).padStart(9, '0') + "\n");
 
             assert.equal(a[0], act1, "Did not correctly resolve address on 630km search query");
         });
