@@ -3,7 +3,13 @@ const Selector = artifacts.require("Selector");
 const fs = require('fs');
 const util = require('util');
 
-// TODO print gas usagee
+const num_requests = 5
+const test_interval_min = 125
+const num_tests = 12
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 contract('GeoENSResolver', async accounts => {
 
@@ -30,49 +36,64 @@ contract('GeoENSResolver', async accounts => {
 
 
     // truncate results file
-    fs.writeFileSync("./test/GeoResolver-results/direct_resolve.txt", "Query Time\n");
-    for (i = 0; i < 100; i++) {
-        it("should resolve a geohash", async () => {
-            var t = process.hrtime();
-            a = await geoResolver.geoAddr(emptynode, 'ezs42bcd');
-            t = process.hrtime(t);
+    it("should benchmark direct query resolution time", async () => {
+        fs.writeFileSync("./test/GeoResolver-results/direct_resolve_cold.csv", "query_time\n");
+        fs.writeFileSync("./test/GeoResolver-results/direct_resolve_warm.csv", "query_time\n");
+        for (nt = 0; nt<num_tests; nt++) {
 
-            // write time to file. (Zero pad ns with padStart)
-            fs.appendFileSync("./test/GeoResolver-results/direct_resolve.txt", t[0] + "." + String(t[1]).padStart(9, '0') + "\n");
+            for (nr=0; nr<num_requests; nr++) {
+                var t = process.hrtime();
+                a = await geoResolver.geoAddr(emptynode, 'ezs42bcd');
+                t = process.hrtime(t);
+                var stringtime = t[0] + "." + String(t[1]).padStart(9, '0') + "\n";
 
-            assert.equal(a[0], act1, "Did not correctly resolve address on direct query");
-        });
-    }
+                // write time to file. (Zero pad ns with padStart)
+                if (nr == 0) {
+                    console.log("Cold: ");
+                    fs.appendFileSync("./test/GeoResolver-results/direct_resolve_cold.csv", stringtime);
+                } else {
+                    console.log("Warm: ");
+                    fs.appendFileSync("./test/GeoResolver-results/direct_resolve_warm.csv", stringtime);
+                }
+                console.log(stringtime)
 
-    // truncate results file
-    fs.writeFileSync("./test/GeoResolver-results/20km_resolve.txt", "Query Time\n");
-    for (i = 0; i < 100; i++) {
-        it("should resolve a 20km radius geohash search", async () => {
-            // if using 40 bits of precision total
-            // dropping to 10 bits gives a precision of 20km
-            var t = process.hrtime();
-            a = await geoResolver.geoAddr(emptynode, 'ezs4');
-            t = process.hrtime(t);
+                assert.equal(a[0], act1, "Did not correctly resolve address on direct query");
+            }
+            await sleep(test_interval_min * 60 * 1000);
+        }
+    });
 
-            // write time to file. (Zero pad ns with padStart)
-            fs.appendFileSync("./test/GeoResolver-results/20km_resolve.txt", t[0] + "." + String(t[1]).padStart(9, '0') + "\n");
+    // larger query bounding box tests below
 
-            assert.equal(a[0], act1, "Did not correctly resolve address on 20km search query");
-        });
-    }
+    //// truncate results file
+    //fs.writeFileSync("./test/GeoResolver-results/20km_resolve.txt", "Query Time\n");
+    //for (i = 0; i < 100; i++) {
+    //    it("should resolve a 20km radius geohash search", async () => {
+    //        // if using 40 bits of precision total
+    //        // dropping to 10 bits gives a precision of 20km
+    //        var t = process.hrtime();
+    //        a = await geoResolver.geoAddr(emptynode, 'ezs4');
+    //        t = process.hrtime(t);
 
-    // truncate results file
-    fs.writeFileSync("./test/GeoResolver-results/630km_resolve.txt", "Query Time\n");
-    for (i = 0; i < 100; i++) {
-        it("should resolve a 630km radius geohash search", async () => {
-            var t = process.hrtime();
-            a = await geoResolver.geoAddr(emptynode, 'ez');
-            t = process.hrtime(t);
+    //        // write time to file. (Zero pad ns with padStart)
+    //        fs.appendFileSync("./test/GeoResolver-results/20km_resolve.txt", t[0] + "." + String(t[1]).padStart(9, '0') + "\n");
 
-            // write time to file. (Zero pad ns with padStart)
-            fs.appendFileSync("./test/GeoResolver-results/630km_resolve.txt", t[0] + "." + String(t[1]).padStart(9, '0') + "\n");
+    //        assert.equal(a[0], act1, "Did not correctly resolve address on 20km search query");
+    //    });
+    //}
 
-            assert.equal(a[0], act1, "Did not correctly resolve address on 630km search query");
-        });
-    }
+    //// truncate results file
+    //fs.writeFileSync("./test/GeoResolver-results/630km_resolve.txt", "Query Time\n");
+    //for (i = 0; i < 100; i++) {
+    //    it("should resolve a 630km radius geohash search", async () => {
+    //        var t = process.hrtime();
+    //        a = await geoResolver.geoAddr(emptynode, 'ez');
+    //        t = process.hrtime(t);
+
+    //        // write time to file. (Zero pad ns with padStart)
+    //        fs.appendFileSync("./test/GeoResolver-results/630km_resolve.txt", t[0] + "." + String(t[1]).padStart(9, '0') + "\n");
+
+    //        assert.equal(a[0], act1, "Did not correctly resolve address on 630km search query");
+    //    });
+    //}
 });
