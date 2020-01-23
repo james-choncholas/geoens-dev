@@ -5,7 +5,7 @@ else
 	QUIET=
 endif
 
-.PHONY: build benchmark
+.PHONY: build benchmark test
 
 help: SHELL:=/bin/bash
 help: ## Show this help.
@@ -14,9 +14,9 @@ help: ## Show this help.
 build: ## compile contracts
 	$(QUIET)truffle compile
 
-benchmark: ## run benchmarks - warning - this could take a while
+benchmark: ## run benchmarks on ropsten testnet (warning - this takes a while)
 	$(QUIET)mkdir -p ./test/GeoResolver-results/
-	$(QUIET)truffle test ./test/GeoResolverBenchmarking.js
+	$(QUIET)truffle test --network localrop ./test/GeoResolverBenchmarking.js
 
-test: ## run basic tests
+test: ## run basic tests on local ganache chain
 	$(QUIET)truffle test ./test/GeoResolverBasicTest.js
