@@ -28,9 +28,9 @@ def main():
 
                 # save pdf of all last experiments
                 if (experiment == wc_experiments[-1]):
-                    plt.xlabel('Query Number')
-                    plt.ylabel('DNS Query Time (ms)')
-                    plt.title("All (Sorted) Query Times")
+                    plt.xlabel('Query')
+                    plt.ylabel('Time (ms)')
+                    plt.title("All (Sorted) GeoENS Query Time Measurements")
                     plt.legend()
                     #plt.show()
                     pdf = matplotlib.backends.backend_pdf.PdfPages(generic_experiment + "_sorted.pdf")
@@ -44,9 +44,9 @@ def main():
 
                 # save pdf of all last experiments
                 if (experiment == wc_experiments[-1]):
-                    plt.xlabel('DNS Query Time (ms)')
+                    plt.xlabel('Query Time (ms)')
                     plt.ylabel('% of Queries Resolved')
-                    plt.title("CDF of Query Time")
+                    plt.title("CDF of GeoENS Query Time")
                     plt.legend()
                     #plt.show()
                     pdf = matplotlib.backends.backend_pdf.PdfPages(generic_experiment + "_cdf.pdf")
