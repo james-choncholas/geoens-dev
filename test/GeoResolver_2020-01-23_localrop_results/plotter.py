@@ -1,11 +1,13 @@
 import pandas as pd
 import numpy as np
+import seaborn as sns
 import matplotlib.pyplot as plt
 import statistics as stats
 import matplotlib.backends.backend_pdf
 
 
 def main():
+    sns.set(style="whitegrid")
     allexps = ['direct_resolve']#, '20km_resolve', '630km_resolve']
     wc = ["warm", "cold"]
 
@@ -28,14 +30,12 @@ def main():
 
                 # save pdf of all last experiments
                 if (experiment == wc_experiments[-1]):
-                    plt.xlabel('Query')
-                    plt.ylabel('Time (ms)')
-                    plt.title("All (Sorted) GeoENS Query Time Measurements")
+                    plt.xlabel('Query', fontsize=15)
+                    plt.ylabel('Time (ms)', fontsize=15)
+                    plt.title("All (Sorted) GeoENS Query Time Measurements", fontsize=20)
                     plt.legend()
                     #plt.show()
-                    pdf = matplotlib.backends.backend_pdf.PdfPages(generic_experiment + "_sorted.pdf")
-                    pdf.savefig()
-                    pdf.close()
+                    plt.savefig(generic_experiment + "_sorted.pdf")
 
                 # CDF
                 fig_id += 1
@@ -44,14 +44,12 @@ def main():
 
                 # save pdf of all last experiments
                 if (experiment == wc_experiments[-1]):
-                    plt.xlabel('Query Time (ms)')
-                    plt.ylabel('% of Queries Resolved')
-                    plt.title("CDF of GeoENS Query Time")
+                    plt.xlabel('Query Time (ms)', fontsize=15)
+                    plt.ylabel('% of Queries Resolved', fontsize=15)
+                    plt.title("CDF of GeoENS Query Time", fontsize=20)
                     plt.legend()
                     #plt.show()
-                    pdf = matplotlib.backends.backend_pdf.PdfPages(generic_experiment + "_cdf.pdf")
-                    pdf.savefig()
-                    pdf.close()
+                    plt.savefig(generic_experiment + "_cdf.pdf")
 
 if __name__ == "__main__":
   main()
