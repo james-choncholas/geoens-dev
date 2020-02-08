@@ -1,14 +1,9 @@
-pragma solidity >=0.4.21 <0.6.0;
+pragma solidity ^0.5.0;
 
 contract GeoENSResolver {
-    // Other code
-
-    bytes4 constant ERC165ID = 0x01ffc9a7;
     bytes4 constant ERC2390 = 0xa263115e;
     uint constant MAX_ADDR_RETURNS = 64;
     uint constant TREE_VISITATION_QUEUESZ = 64;
-    //string constant BASE_32_TO_CHARS = "0123456789bcdefghjkmnpqrstuvwxyz";
-    //bytes constant CHARS_TO_BASE_32 = hex"30313233343536373839626364656667686A6B6D6E707172737475767778797A";
     uint8 constant ASCII_0 = 48;
     uint8 constant ASCII_9 = 57;
     uint8 constant ASCII_a = 97;
@@ -30,23 +25,11 @@ contract GeoENSResolver {
     // length is 8 characters)
     Node[] geomap;
 
-    address public owner;
+    event GeoENSRecordChanged(bytes32 indexed node, string geohash, address addr);
 
-    event AddrChanged(bytes32 indexed node, string geohash, address addr);
-
-    modifier isOwner() {
-        require(msg.sender == owner);
+    modifier authorised(bytes32 node) {
         _;
-    }
-
-    constructor() public {
-        owner = msg.sender;
-        //geomap.push(Node(address(0), 0, new uint256[](32)));
-        geomap.push( Node({
-            data: address(0),
-            parent: 0,
-            children: new uint256[](32)
-        }));
+        // always authorized for testing
     }
 
     // only 5 bits of ret value are used
@@ -85,6 +68,7 @@ contract GeoENSResolver {
         require(bytes(geohash).length < 9); // 8 characters = +-1.9 meter resolution
 
         ret = new address[](MAX_ADDR_RETURNS);
+        if (geomap.length == 0) { return ret; }
         uint ret_i = 0;
 
         // walk into the geomap data structure
@@ -137,9 +121,18 @@ contract GeoENSResolver {
     }
 
     // when setting, geohash must be precise to 8 digits.
-    function setGeoAddr(bytes32 node, string calldata geohash, address addr) external isOwner() {
+    function setGeoAddr(bytes32 node, string calldata geohash, address addr) external authorised(node) {
         bytes32(node); // single node georesolver ignores node
         require(bytes(geohash).length == 8); // 8 characters = +-1.9 meter resolution
+
+        // create root node if not yet created
+        if (geomap.length == 0) {
+            geomap.push( Node({
+                data: address(0),
+                parent: 0,
+                children: new uint256[](32)
+            }));
+        }
 
         // walk into the geomap data structure
         uint pointer = 0; // not actual pointer but index into geomap
@@ -163,14 +156,10 @@ contract GeoENSResolver {
         Node storage cur_node = geomap[pointer]; // storage = get reference
         cur_node.data = addr;
 
-        emit AddrChanged(node, geohash, addr);
+        emit GeoENSRecordChanged(node, geohash, addr);
     }
 
-    function supportsInterface(bytes4 interfaceID) external pure returns (bool) {
-        return interfaceID == ERC165ID || interfaceID == ERC2390;
-    }
-
-    function() external payable {
-        revert();
+    function supportsInterface(bytes4 interfaceID) public pure returns (bool) {
+        return interfaceID == ERC2390;
     }
 }

@@ -22,17 +22,6 @@ contract('GeoENSResolver', async accounts => {
     });
 
 
-    it("should not accept sent funds", async () => {
-        var reverted = false;
-        try {
-            await geoResolver.sendTransaction({ from: owner_account, value: 1});
-        } catch (e) {
-            reverted = true;
-        }
-        assert.equal(reverted, true, "Owner sent funds to contract");
-    });
-
-
     it("should set a geohash", async () => {
         //await debug(geoResolver.setGeoAddr(emptynode, 'ezs42bcd', act1, {from: owner_account}));
         await geoResolver.setGeoAddr(emptynode, geo1, act1, {from: owner_account});
@@ -90,9 +79,6 @@ contract('GeoENSResolver', async accounts => {
 
 
     it("should return supported interfaces", async () => {
-        shouldbeyes = await geoResolver.supportsInterface("0x01ffc9a7", {from: owner_account});
-        assert.equal(shouldbeyes, true, "ERC165 supported interface should return true");
-
         let selector = await Selector.new({from: owner_account});
         erc165Hash = await selector.calculateSelector();
         //console.log("should support interface " + erc165Hash);
