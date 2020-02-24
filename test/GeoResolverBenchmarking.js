@@ -11,6 +11,8 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+// WARNING: This is for basic benchmarking - for real results use geoens-bridge
+
 contract('GeoENSResolver', async accounts => {
 
     var owner_account = accounts[0];
