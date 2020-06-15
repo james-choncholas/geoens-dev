@@ -11,6 +11,8 @@ Deployment credentials not stored in this repository. To deploy, store deploymen
 
 Follow guide https://medium.com/@guccimanepunk/how-to-deploy-a-truffle-contract-to-ropsten-e2fb817870c1
 
+- Make sure the [account](https://ropsten.etherscan.io/address/0x467d456bd81b34109aefd5a5eccc145e1688732d) has money.
+
 ### If using local client - start geth
 Create an account.
 ```
